@@ -59,11 +59,11 @@ function addTaskItem(taskText) {
     const doneBtn = createDoneButton(li);
     li.appendChild(doneBtn);
 
-   /* // Create Edit button
+    // Create Edit button
     const editBtn = createEditButton(li, taskSpan);
     li.appendChild(editBtn);
 
-    // Create Delete button
+    /*// Create Delete button
     const deleteBtn = createDeleteButton(li);
     li.appendChild(deleteBtn); */
 }
@@ -87,7 +87,7 @@ function createDoneButton(li) {
 
     return doneBtn;
 }
-/*
+
 function createEditButton(li, taskSpan) {
     const editBtn = document.createElement("button");
 
@@ -110,7 +110,7 @@ function handleEditClick(li, taskSpan) {
         alert("No changes made");
     }
 }
-
+/*
 function createDeleteButton(li) {
     const deleteBtn = document.createElement("button");
 
