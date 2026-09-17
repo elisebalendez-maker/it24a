@@ -30,83 +30,104 @@
 function getTasks() {
     const input = document.getElementById("taskInput");
     const text = input.value.trim();
-    
+
     console.log("The input value is: " + input.value);
+
     return text;
 }
 
-function addTask(){ 
+function addTask() {
     const taskText = getTasks();
+
+    if (taskText === "") {
+        return;
+    }
+
     addTaskItem(taskText);
 }
+
 function addTaskItem(taskText) {
     const li = document.createElement("li");
     const taskSpan = document.createElement("span");
+
     taskSpan.textContent = taskText;
     li.appendChild(taskSpan);
 
     document.getElementById("taskList").appendChild(li);
-    //call createDoneButton () function
+
+    // Create Done button
     const doneBtn = createDoneButton(li);
     li.appendChild(doneBtn);
 
-    //call createEditButton () function
-    const editBtn = createEditButton(li);
+    // Create Edit button
+    const editBtn = createEditButton(li, taskSpan);
     li.appendChild(editBtn);
 
-    //call createDeleteButton () function
+    // Create Delete button
     const deleteBtn = createDeleteButton(li);
     li.appendChild(deleteBtn);
 }
+
 function createDoneButton(li) {
     const doneBtn = document.createElement("button");
+
     doneBtn.textContent = "Done";
     doneBtn.style.marginLeft = "8px";
+
     doneBtn.onclick = () => {
-    
         li.classList.add("done");
         doneBtn.disabled = true;
-        console.log("Task marked as done:", li.textContent, new Date());
+
+        console.log(
+            "Task marked as done:",
+            li.textContent,
+            new Date()
+        );
     };
+
     return doneBtn;
 }
-/*
-function createEditButton(li,taskSpan) {
+
+function createEditButton(li, taskSpan) {
     const editBtn = document.createElement("button");
+
     editBtn.textContent = "Edit";
     editBtn.style.marginLeft = "8px";
-    editBtn.onclick = () => handleEditClick(li);
-    return editBtn;
 
+    editBtn.onclick = () => handleEditClick(li, taskSpan);
+
+    return editBtn;
 }
 
-function handleEditClick(li) {
-    const taskSpan = li.firstChild.textContent;
-    const newText = prompt("Edit your task:");
+function handleEditClick(li, taskSpan) {
+    const newText = prompt("Edit your task:", taskSpan.textContent);
 
     if (newText !== null && newText.trim() !== "") {
-        li.firstChild.textContent = newText.trim();
+        taskSpan.textContent = newText.trim();
+
         alert("Updated task");
     } else {
         alert("No changes made");
     }
-
 }
-
+/*
 function createDeleteButton(li) {
     const deleteBtn = document.createElement("button");
+
     deleteBtn.textContent = "Delete";
     deleteBtn.style.marginLeft = "8px";
-    deleteBtn.onclick = () => handleDeleteClick();
+
+    deleteBtn.onclick = () => handleDeleteClick(li);
+
     return deleteBtn;
 }
 
-function handleDeleteClick() {
+function handleDeleteClick(li) {
     li.remove();
-    alert("Task deleted");
-}
-*/
 
+    alert("Task deleted");
+}*/
 </script>
+
 </body>
 </html>
