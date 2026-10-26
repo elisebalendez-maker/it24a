@@ -3,131 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List</title>
+    <title>Maps</title>
 
-    <style>
-        .done {
-            text-decoration: line-through;
-            color: gray;
-        }
-    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
 </head>
 
+<style>
+    #map {
+        height: 500px;
+    }
+
+   const.popup-image {
+        max-width: 200px;
+        height: auto;
+        object-fit: fill;
+    }
+
+    #locations {
+        width: 250px;
+    }
+
+    .location {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        cursor: pointer;
+    }
+
+    .location:hover {
+        background: #eee;
+    }
+
+    .container {
+        display: flex;
+        gap: 15px;
+    }
+</style>
+
 <body>
+    <h1>Simple Maps</h1>
+    <div id="map"></div>
 
-    <h1>To-Do List</h1>
+    <h3>Locations</h3>
+    <div id="locations-list"></div>
 
-    <input type="text"
-           id="taskInput"
-           placeholder="Enter a task">
-
-    <button onclick="addTask()">Add Task</button>
-
-    <ul id="taskList"></ul>
+    <div></div>
+</body>
 
 <script>
 
-function getTasks() {
-    const input = document.getElementById("taskInput");
-    const text = input.value.trim();
+function initMap(mapDataUrl) {
+    const map = L.map('map').setView([8.360, 124.868], 17);
 
-    console.log("The input value is: " + input.value);
+    // OPENSTREETMAP LAYER
+    const streets = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }
+    );
 
-    return text;
-}
+    // Satellite layer
+    const satellite = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri, Maxar, Earthstar Geographics, and GIS User Community'
+        }
+    );
 
-function addTask() {
-    const taskText = getTasks();
+    satellite.addTo(map);
 
-    if (taskText === "") {
-        return;
-    }
-
-    addTaskItem(taskText);
-}
-
-function addTaskItem(taskText) {
-    const li = document.createElement("li");
-    const taskSpan = document.createElement("span");
-
-    taskSpan.textContent = taskText;
-    li.appendChild(taskSpan);
-
-    document.getElementById("taskList").appendChild(li);
-
-    // Create Done button
-    const doneBtn = createDoneButton(li);
-    li.appendChild(doneBtn);
-
-    // Create Edit button
-    const editBtn = createEditButton(li, taskSpan);
-    li.appendChild(editBtn);
-
-    // Create Delete button
-    const deleteBtn = createDeleteButton(li);
-    li.appendChild(deleteBtn); 
-}
-
-function createDoneButton(li) {
-    const doneBtn = document.createElement("button");
-
-    doneBtn.textContent = "Done";
-    doneBtn.style.marginLeft = "8px";
-
-    doneBtn.onclick = () => {
-        li.classList.add("done");
-        doneBtn.disabled = true;
-
-        console.log(
-            "Task marked as done:",
-            li.textContent,
-            new Date()
-        );
+    // Layer control
+    const baseMaps = {
+        "OpenStreetMap": streets,
+        "Satellite": satellite
     };
 
-    return doneBtn;
+    L.control.layers(baseMaps).addTo(map);
+
+    // Render pins
+    fetch(mapDataUrl)
+        .then(response => response.json())
+        .then(data => {
+
+            data.forEach(pin => {
+                const marker = L.marker([pin.lat, pin.lng]).addTo(map);
+
+                const image = `<img src="${pin.image}" class="popup-image">`;
+
+                marker.bindPopup(`
+                    ${pin.title} <br>
+                    <hr>
+                    ${image}
+                `);
+
+                // Location list
+                const item = document.createElement('div');
+                item.className = 'location';
+                item.textContent = pin.title;
+
+                document.getElementById('locations-list').appendChild(item);
+
+                // Fly to location
+                item.onclick = () => {
+                    map.flyTo([pin.lat, pin.lng], 18);
+                    marker.openPopup();
+                };
+            });
+        });
 }
 
-function createEditButton(li, taskSpan) {
-    const editBtn = document.createElement("button");
+initMap('campus-map.json');
 
-    editBtn.textContent = "Edit";
-    editBtn.style.marginLeft = "8px";
-
-    editBtn.onclick = () => handleEditClick(li, taskSpan);
-
-    return editBtn;
-}
-
-function handleEditClick(li, taskSpan) {
-    const newText = prompt("Edit your task:", taskSpan.textContent);
-
-    if (newText !== null && newText.trim() !== "") {
-        taskSpan.textContent = newText.trim();
-
-        alert("Updated task");
-    } else {
-        alert("No changes made");
-    }
-}
-
-function createDeleteButton(li) {
-    const deleteBtn = document.createElement("button");
-
-    deleteBtn.textContent = "Delete";
-    deleteBtn.style.marginLeft = "8px";
-
-    deleteBtn.onclick = () => handleDeleteClick(li);
-
-    return deleteBtn;
-}
-
-function handleDeleteClick(li) {
-    li.remove();
-
-    alert("Task deleted");
-} 
 </script>
-
-</body>
 </html>
